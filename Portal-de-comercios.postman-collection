@@ -1,0 +1,4256 @@
+{
+	"info": {
+		"_postman_id": "2b99a2c6-b399-400c-80ba-3c5b85dfb4d2",
+		"name": "Portal-de-comercios",
+		"description": "# **Automatización de APIs**\n\n🚀 Este proyecto contiene pruebas automatizadas para garantizar la funcionalidad y consistencia de los endpoints del portal de comercios.\n\n<img src=\"https://content.pstmn.io/776cdb23-a19a-490c-9bf6-1f946a175090/UG9ydGFsLnBuZw==\">\n\n---\n\n## **🔍 Propósito**\n\nValidar que las APIs del portal de comercios operen correctamente, proporcionando:\n\n- **Autenticación segura**: Login y manejo de tokens (`access_token`).\n    \n- **Gestión de datos**: Validación y actualización de información del comercio.\n    \n- **Procesamiento de transacciones**: Validación de pagos y consultas.\n    \n- **Generación de reportes**: Comprobación de endpoints relacionados con informes.\n    \n\n---\n\n## **📂 Estructura del Proyecto**\n\n1. **Colección Principal**\n    \n    - Autenticación (`login)`.\n        \n    - Gestión de datos del comercio (`sellerId`, etc.).\n        \n    - Transacciones.\n        \n    - Gestion de usuarios.\n        \n2. **Entornos Configurados**  \n    Variables dinámicas:\n    \n    - `{{base_url}}`\n        \n    - `{{onb_backend_access_token}}`\n        \n    - `{{sellerId}}`\n        \n3. **Automatización de Pruebas**\n    \n    - **Pre-request Scripts**: Configuración automática de tokens.\n        \n    - **Tests**: Validaciones automatizadas de las respuestas y códigos de estado.\n        \n\n---\n\n## **💡 Cómo Usar**\n\n1. Configura las variables de entorno:\n    \n    - `{{base_url}}` para la URL base del entorno.\n        \n    - `{{onb_backend_access_token}}` para el token de acceso.\n        \n2. Ejecuta la colección completa o una solicitud específica según el caso.\n    \n3. Revisa los resultados en el **Test Runner.**\n    \n\n---\n\n## **✅ Criterios de Aceptación**\n\n- Todos los endpoints deben devolver el código de estado esperado (`200`, `401`, etc.).\n    \n- Los tokens deben gestionarse dinámicamente sin interrupciones.\n    \n- La información clave como `sellerId` debe coincidir con los valores esperados.\n    \n\n---\n\n## **📊 Beneficios del Proyecto**\n\n- **Eficiencia:** Reducción de tiempos manuales en pruebas.\n    \n- **Confiabilidad:** Identificación rápida de errores en las APIs.\n    \n- **Escalabilidad:** Fácil incorporación de nuevos endpoints.\n    \n\n---\n\n## **🔗 Recursos Adicionales**\n\n- [Markdown Cheatsheet](https://www.markdownguide.org/cheat-sheet/)\n    \n- [Documentación de Postman](https://learning.postman.com/docs/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20357304"
+	},
+	"item": [
+		{
+			"name": "Login (iniciar sesión)",
+			"item": [
+				{
+					"name": "Sign in",
+					"item": [
+						{
+							"name": "failed",
+							"item": [
+								{
+									"name": "Empty Fields",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 400\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta esté en formato JSON\r",
+													"pm.test(\"Response is in JSON format\", function () {\r",
+													"    pm.response.to.be.json;\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"\",\r\n    \"password\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/login",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Email only (no password)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 400\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta esté en formato JSON\r",
+													"pm.test(\"Response is in JSON format\", function () {\r",
+													"    pm.response.to.be.json;\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Validar mensaje de error de longitud de contraseña\", function () {\r",
+													"    // Obtener el mensaje de error de la respuesta\r",
+													"    var mensaje = pm.response.json().message;\r",
+													"\r",
+													"    // Comprobar que el mensaje contiene el texto esperado\r",
+													"    pm.expect(mensaje).to.include(\"BadRequestException: password must be longer than or equal to 5 characters\");\r",
+													"    pm.expect(mensaje).to.include(\"password should not be empty\");\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{invalid_user}}\",\r\n    \"password\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/login",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Password only (no email)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 400\", function () {\r",
+													"    pm.response.to.have.status(400);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta esté en formato JSON\r",
+													"pm.test(\"Response is in JSON format\", function () {\r",
+													"    pm.response.to.be.json;\r",
+													"});\r",
+													"\r",
+													"pm.test(\"Validar respuesta cuando username está vacío\", function () {\r",
+													"    pm.response.to.have.status(400);  // Error esperado\r",
+													"    var mensaje = pm.response.json().message;\r",
+													"    pm.expect(mensaje).to.include(\"username should not be empty\");  // Validar el mensaje de error\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/login",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Invalid credentials",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 401\", function () {\r",
+													"    pm.response.to.have.status(401);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta no contiene contraseñas\r",
+													"\r",
+													"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+													"    const responseText = pm.response.text();\r",
+													"    pm.expect(responseText).to.not.include(\"password\");\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta esté en formato JSON\r",
+													"pm.test(\"Response is in JSON format\", function () {\r",
+													"    pm.response.to.be.json;\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{invalid_user}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/login",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "passed",
+							"item": [
+								{
+									"name": "session successful (user)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 200\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta no contiene contraseñas\r",
+													"\r",
+													"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+													"    const responseText = pm.response.text();\r",
+													"    pm.expect(responseText).to.not.include(\"password\");\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta esté en formato JSON\r",
+													"pm.test(\"Response is in JSON format\", function () {\r",
+													"    pm.response.to.be.json;\r",
+													"});\r",
+													"\r",
+													"// validar que el cuerpo de la respuesta contiene \"role\": \"user\"\r",
+													"pm.test(\"El rol en la respuesta es 'user'\", function () {\r",
+													"    let jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.role).to.eql(\"user\");\r",
+													"});\r",
+													"\r",
+													"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													"\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{rol-user}}\",\r\n    \"password\": \"{{password-rol-user}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/login",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "session successful (admin)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"pm.test(\"Status code is 200\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta no contiene contraseñas\r",
+													"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+													"    const responseText = pm.response.text();\r",
+													"    pm.expect(responseText).to.not.include(\"password\");\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta esté en formato JSON\r",
+													"pm.test(\"Response is in JSON format\", function () {\r",
+													"    pm.response.to.be.json;\r",
+													"});\r",
+													"\r",
+													"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+													"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+													"    let jsonData = pm.response.json();\r",
+													"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+													"});\r",
+													"\r",
+													"\r",
+													"// Parsear la respuesta como JSON\r",
+													"let responseBody = pm.response.json();\r",
+													"\r",
+													"// Verificar que el campo 'merchantId' está presente\r",
+													"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+													"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+													"});\r",
+													"\r",
+													"// Guardar 'merchantId' en el environment actual\r",
+													"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+													"\r",
+													"// Mensaje en la consola para confirmar\r",
+													"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+													"\r",
+													"\r",
+													"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+													"\r",
+													"let response = pm.response.json();\r",
+													"pm.environment.set(\"access_token\", response.access_token);\r",
+													"console.log(\"Access token guardado:\", response.access_token);\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/login",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"login"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Reset password",
+					"item": [
+						{
+							"name": "failed",
+							"item": [
+								{
+									"name": "Empty Field",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 404\", function () {\r",
+													"    pm.response.to.have.status(404);\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"email\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/forgot-password",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"forgot-password"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Unregistered Mail",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 404\", function () {\r",
+													"    pm.response.to.have.status(404);\r",
+													"});\r",
+													"\r",
+													"\r",
+													"pm.test(\"Validar que el mensaje contenga el email esperado\", function () {\r",
+													"    // Obtener el cuerpo de la respuesta\r",
+													"    const response = pm.response.json();\r",
+													"\r",
+													"    // Extraer el mensaje de error\r",
+													"    const mensaje = response.message;\r",
+													"\r",
+													"    // Obtener el valor de la variable 'email_no_registrado' del entorno o colección\r",
+													"    const emailEsperado = pm.variables.get(\"email_no_registrado\");\r",
+													"\r",
+													"    // Validar que el mensaje contenga el email esperado\r",
+													"    pm.expect(mensaje).to.include(emailEsperado);\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"email\": \"{{email_no_registrado}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/forgot-password",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"forgot-password"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "passed",
+							"item": [
+								{
+									"name": "Reset Successful",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"// Verificar que el código de estado sea 200\r",
+													"\r",
+													"pm.test(\"Status code is 200\", function () {\r",
+													"    pm.response.to.have.status(200);\r",
+													"});\r",
+													"\r",
+													"// Verificar que la respuesta no contiene contraseñas\r",
+													"\r",
+													"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+													"    const responseText = pm.response.text();\r",
+													"    pm.expect(responseText).to.not.include(\"password\");\r",
+													"});\r",
+													"\r",
+													"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+													"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+													"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{onb_backend_access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\"email\": \"{{email_para_reseteo}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/users/forgot-password",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"users",
+												"forgot-password"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			],
+			"description": "### Descripción de Pruebas en Postman\n\n#### **Sign In**\n\n**Descripción:**\n\nEste endpoint contiene todas las requests relacionadas con el proceso de autenticación de usuario.\n\n- 📌 **Endpoint:** `/users/login`\n    \n- 📤 **Método:** `POST`\n    \n- 🌐 **URL Base:** `{{url}}/users/login`\n    \n\n**Pruebas:**\n\n1. **Autenticación para roles admin y user:** Verificar que los usuarios con diferentes roles puedan iniciar sesión correctamente.\n    \n2. **Validación de respuesta correcta:** Comprobar que la respuesta incluya un código `200`, un token válido y el rol correspondiente del usuario.\n    \n3. **Manejo de errores:** Validar respuestas ante casos como credenciales incorrectas, usuario inexistente o campos faltantes.\n    \n\n---\n\n#### **Reset Password**\n\n**Descripción:**\n\nEste endpoint permite a los usuarios restablecer su contraseña en caso de olvido o por motivos de seguridad.\n\n- 📌 **Endpoint:** `/users/forgot-password`\n    \n- 📤 **Método:** `POST`\n    \n- 🌐 **URL Base:** `{{url}}/users/forgot-password`\n    \n\n**Pruebas:**\n\n1. **Enviar un email válido registrado:** Confirmar que el sistema envía un correo de recuperación exitosamente.\n    \n2. **Email no registrado:** Verificar que el sistema devuelve un mensaje de error apropiado.\n    \n3. **Email vacío:** Validar que el sistema no permita enviar la solicitud sin un correo.\n    \n\n---\n\n#### **Log Out**\n\n**Descripción:**\n\nPermite al usuario cerrar sesión, invalidando su token de autenticación.\n\n- 📌 **Endpoint:** `/users/logout`\n    \n- 📤 **Método:** `GET`\n    \n- 🌐 **URL Base:** `{{url}}/users/logout`\n    \n\n**Pruebas:**\n\n1. **Cierre de Sesión Correcto:** Comprobar que el token del usuario se invalida correctamente.\n    \n2. **Token Expirado:** Verificar que el sistema maneje adecuadamente solicitudes con un token expirado."
+		},
+		{
+			"name": "Seller (Mi comercio)",
+			"item": [
+				{
+					"name": "physical",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta esté en formato JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+											"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// Parsear la respuesta como JSON\r",
+											"let responseBody = pm.response.json();\r",
+											"\r",
+											"// Verificar que el campo 'merchantId' está presente\r",
+											"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+											"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+											"});\r",
+											"\r",
+											"// Guardar 'merchantId' en el environment actual\r",
+											"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+											"\r",
+											"\r",
+											"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"let response = pm.response.json();\r",
+											"pm.environment.set(\"access_token\", response.access_token);\r",
+											"console.log(\"Access token guardado:\", response.access_token);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Seller",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"// Parsear el cuerpo de la respuesta como JSON\r",
+											"let responseBody = pm.response.json(); // Si no es JSON, usa .text() en su lugar\r",
+											"\r",
+											"// Verificar que el campo 'sellerId' está presente\r",
+											"pm.test(\"El campo 'sellerId' está presente en la respuesta\", function () {\r",
+											"    pm.expect(responseBody).to.have.property(\"sellerId\");\r",
+											"});\r",
+											"\r",
+											"// Guardar 'sellerId' en el environment actual\r",
+											"pm.environment.set(\"sellerId\", responseBody.sellerId);\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"sellerId guardado:\", responseBody.sellerId);\r",
+											"\r",
+											"//pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: \"Bearer \" + pm.environment.get(\"access_token\")\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n{\r\n    \"name\": \"{{name}}\",\r\n    \"mccId\": \"{{mccId}}\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"merchantAccountId\": \"{{merchantAccountId}}\",\r\n    \"bankId\": \"{{bankId}}\",\r\n    \"countryId\": \"67a33127-d23b-4bd1-8818-2fd597eb7137\",\r\n    \"cityId\": \"8d8fae09-e9f6-439a-93be-a6a78048f481\",\r\n    \"postalCode\": \"125000\",\r\n    \"sellerType\": \"physical\",\r\n    \"url\": null,\r\n    \"email\": \"{{email_alta_de_comercio}}\",\r\n    \"phone\": \"+595984388144\",\r\n    \"address\": \"San Lorenzo centro\",\r\n    \"streetNumber\": \"1250\",\r\n    \"department\": null,\r\n    \"neighborhood\": null,\r\n    \"sellerOwnerId\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/sellers",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Seller by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Parsear la respuesta como JSON\r",
+											"let responseBody = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Validar que sellerId está presente en el body\", function () {\r",
+											"    // Obtener el cuerpo de la respuesta como JSON\r",
+											"    var responseBody = pm.response.json();\r",
+											"\r",
+											"    // Verificar que la propiedad sellerId esté presente\r",
+											"    pm.expect(responseBody).to.have.property(\"sellerId\");\r",
+											"\r",
+											"    // Verificar que el valor de sellerId coincida con la variable de entorno {{sellerId}}\r",
+											"    var sellerIdExpected = pm.environment.get(\"sellerId\");\r",
+											"    pm.expect(responseBody.sellerId).to.eql(sellerIdExpected, \"El sellerId no coincide con el valor esperado.\");\r",
+											"});\r",
+											"\r",
+											"//pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"\r",
+											"// Obtener el valor original del campo 'name' de la respuesta de un GET\r",
+											"let originalName = pm.response.json().name;\r",
+											"pm.environment.set(\"originalName\", originalName);\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"Valor original de name guardado:\", originalName);\r",
+											"\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: \"Bearer \" + pm.environment.get(\"access_token\")\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/sellers/{{sellerId}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers",
+										"{{sellerId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Seller by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Obtener el valor original guardado\r",
+											"let originalName = pm.environment.get(\"originalName\");\r",
+											"\r",
+											"// Obtener el nuevo valor del campo 'name' de la respuesta del PUT\r",
+											"let newName = pm.response.json().name;\r",
+											"\r",
+											"// Validar que 'name' cambió\r",
+											"pm.test(\"El valor de 'name' ha cambiado\", function () {\r",
+											"    pm.expect(newName).to.not.eql(originalName);\r",
+											"});\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"Valor original de name:\", originalName);\r",
+											"console.log(\"Nuevo valor de name:\", newName);\r",
+											"\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: \"Bearer \" + pm.environment.get(\"access_token\")\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n{\r\n    \"name\": \"{{namedos}}\",\r\n    \"mccId\": \"{{mccId}}\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"merchantAccountId\": \"{{merchantAccountId}}\",\r\n    \"bankId\": \"{{bankId}}\",\r\n    \"countryId\": \"67a33127-d23b-4bd1-8818-2fd597eb7137\",\r\n    \"cityId\": \"8d8fae09-e9f6-439a-93be-a6a78048f481\",\r\n    \"postalCode\": \"125000\",\r\n    \"sellerType\": \"physical\",\r\n    \"url\": null,\r\n    \"email\": \"{{email_alta_de_comercio}}\",\r\n    \"phone\": \"+595984388144\",\r\n    \"address\": \"San Lorenzo centro\",\r\n    \"streetNumber\": \"1250\",\r\n    \"department\": null,\r\n    \"neighborhood\": null,\r\n    \"sellerOwnerId\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/sellers/{{sellerId}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers",
+										"{{sellerId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Seller status by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: \"Bearer \" + pm.environment.get(\"access_token\")\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"status\": \"draft\",\r\n  \"updatedBy\": \"Miguel Esquivel\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/sellers/{{sellerId}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers",
+										"{{sellerId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Seller by id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Obtener valores iniciales guardados antes del DELETE\r",
+											"let merchantId = pm.environment.get(\"merchantId\");\r",
+											"let originalName = pm.environment.get(\"originalName\");\r",
+											"\r",
+											"console.log(\"Preparación: ID del comercio:\", merchantId);\r",
+											"console.log(\"Preparación: Nombre original del comercio:\", originalName);\r",
+											"\r",
+											"// Validar que el DELETE fue exitoso\r",
+											"pm.test(\"Status code is 200 (DELETE exitoso, sin respuesta)\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(200); // Código esperado para DELETE sin contenido\r",
+											"});\r",
+											"\r",
+											"// Construir la URL para el GET del comercio eliminado\r",
+											"let resourceUrl = pm.environment.get(\"baseUrl\") + \"/merchants/\" + merchantId;\r",
+											"\r",
+											"// Realizar el GET para verificar que el comercio ya no existe\r",
+											"pm.sendRequest({\r",
+											"    url: resourceUrl,\r",
+											"    method: 'GET',\r",
+											"    header: {\r",
+											"        Authorization: \"Bearer \" + pm.environment.get(\"access_token\")\r",
+											"    }\r",
+											"}, function (err, response) {\r",
+											"    // Verificar que la respuesta existe\r",
+											"    if (response && response.code) {\r",
+											"        // Validar que el comercio no existe (código 404)\r",
+											"        pm.test(\"El comercio eliminado ya no existe (404)\", function () {\r",
+											"            pm.expect(response.code).to.eql(404); // Código esperado si el recurso ya no existe\r",
+											"        });\r",
+											"\r",
+											"        // Si hay una respuesta inesperada (borrado lógico), validar que el campo `name` no coincide\r",
+											"        if (response.text()) {\r",
+											"            let responseBody = response.json();\r",
+											"            pm.test(\"El comercio eliminado no tiene el nombre original\", function () {\r",
+											"                pm.expect(responseBody.name).to.not.eql(originalName);\r",
+											"            });\r",
+											"\r",
+											"            console.log(\"Respuesta obtenida del comercio eliminado:\", responseBody);\r",
+											"        } else {\r",
+											"            console.log(\"Respuesta vacía. Comercio eliminado correctamente.\");\r",
+											"        }\r",
+											"    } else {\r",
+											"        // Si no hay respuesta o si la respuesta es inválida\r",
+											"        console.log(\"No se recibió respuesta del servidor.\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/sellers/{{sellerId}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers",
+										"{{sellerId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List sellers",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Obtener el valor guardado en la variable 'namedos'\r",
+											"let namedos = pm.environment.get(\"namedos\");\r",
+											"\r",
+											"// Realizar el GET para verificar que el nombre no esté presente en el cuerpo de la respuesta\r",
+											"pm.test(\"El nombre no está presente en la respuesta\", function () {\r",
+											"    let responseBody = pm.response.json(); // Parsear la respuesta como JSON\r",
+											"    \r",
+											"    // Verificar si el nombre guardado en 'namedos' está presente en la respuesta\r",
+											"    let nameFound = false;\r",
+											"\r",
+											"    // Si la respuesta es un objeto con un campo 'name'\r",
+											"    if (responseBody.name && responseBody.name === namedos) {\r",
+											"        nameFound = true;\r",
+											"    }\r",
+											"    \r",
+											"    // Si la respuesta es una lista de comercios\r",
+											"    else if (Array.isArray(responseBody)) {\r",
+											"        responseBody.forEach(function(merchant) {\r",
+											"            if (merchant.name === namedos) {\r",
+											"                nameFound = true;\r",
+											"            }\r",
+											"        });\r",
+											"    }\r",
+											"\r",
+											"    // Validar que el nombre no esté presente\r",
+											"    pm.expect(nameFound).to.eql(false); // El nombre no debe estar presente\r",
+											"});\r",
+											"\r",
+											"// Mensaje en consola\r",
+											"console.log(\"Validación: El nombre a buscar es:\", namedos);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/sellers/merchant/{{merchantId}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers",
+										"merchant",
+										"{{merchantId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Validation",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta esté en formato JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+											"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// Parsear la respuesta como JSON\r",
+											"let responseBody = pm.response.json();\r",
+											"\r",
+											"// Verificar que el campo 'merchantId' está presente\r",
+											"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+											"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+											"});\r",
+											"\r",
+											"// Guardar 'merchantId' en el environment actual\r",
+											"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+											"\r",
+											"\r",
+											"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"let response = pm.response.json();\r",
+											"pm.environment.set(\"access_token\", response.access_token);\r",
+											"console.log(\"Access token guardado:\", response.access_token);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Seller validation email duplicate",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"// Parsear el cuerpo de la respuesta como JSON\r",
+											"let responseBody = pm.response.json(); // Si no es JSON, usa .text() en su lugar\r",
+											"\r",
+											"pm.test(\"Validar respuesta cuando el correo ya esta en uso\", function () {\r",
+											"    pm.response.to.have.status(400);  // Error esperado\r",
+											"    var mensaje = pm.response.json().message;\r",
+											"    pm.expect(mensaje).to.include(\"DataProviderExpectedError: Seller with email [miguelesquivel170@gmail.com] already exists\");  // Validar el mensaje de error\r",
+											"});\r",
+											"//pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: \"Bearer \" + pm.environment.get(\"access_token\")\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n{\r\n    \"name\": \"{{name}}\",\r\n    \"mccId\": \"{{mccId}}\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"merchantAccountId\": \"{{merchantAccountId}}\",\r\n    \"bankId\": \"{{bankId}}\",\r\n    \"countryId\": \"67a33127-d23b-4bd1-8818-2fd597eb7137\",\r\n    \"cityId\": \"8d8fae09-e9f6-439a-93be-a6a78048f481\",\r\n    \"postalCode\": \"125000\",\r\n    \"sellerType\": \"physical\",\r\n    \"url\": null,\r\n    \"email\": \"miguelesquivel170@gmail.com\",\r\n    \"phone\": \"+595984388144\",\r\n    \"address\": \"San Lorenzo centro\",\r\n    \"streetNumber\": \"1250\",\r\n    \"department\": null,\r\n    \"neighborhood\": null,\r\n    \"sellerOwnerId\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/sellers",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"sellers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "#### **Descripción:**\n\nEste endpoint proporciona un conjunto de funcionalidades clave para gestionar los **comercios (sellers)** asociados al sistema. Incluye acceso a la información detallada del comercio del usuario autenticado, la creación de nuevos sellers, y operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para la administración completa de comercios.\n\n📌 Endpoint: /sellers\n\n**📤 Método: POST - GET - PUT - DELETE**\n\n#### **🌐 URL Base:** {{url}}/sellers\n\nPruebas:\n\n- Acceso a la Información del Comercio Asociado\n    \n- Creación de Nuevos Sellers\n    \n- **Gestión CRUD de Comercios**:\n    \n    - **Crear**: Añadir nuevos comercios al sistema.\n        \n    - **Leer**: Consultar detalles específicos o listar todos los comercios.\n        \n    - **Actualizar**: Modificar datos existentes como dirección o estado.\n        \n    - **Eliminar**: Remover comercios del sistema de forma permanente\n        \n\n### **Detalles del Endpoint**\n\n| Función | Método | Endpoint | Descripción |\n| --- | --- | --- | --- |\n| Ver detalles | `GET` | `/sellers/details` | Obtiene la información del comercio asociado al usuario autenticado. |\n| Crear seller | `POST` | `/sellers` | Crea un nuevo comercio con la información proporcionada. |\n| Listar sellers | `GET` | `/sellers` | Devuelve una lista de todos los comercios registrados. |\n| Actualizar | `PUT` | `/sellers/{id}` | Actualiza los detalles de un comercio específico. |\n| Eliminar | `DELETE` | `/sellers/{id}` | Elimina un comercio por su ID. |"
+		},
+		{
+			"name": "User management (Gestión de usuarios)",
+			"item": [
+				{
+					"name": "admin",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta esté en formato JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+											"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// Parsear la respuesta como JSON\r",
+											"let responseBody = pm.response.json();\r",
+											"\r",
+											"// Verificar que el campo 'merchantId' está presente\r",
+											"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+											"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+											"});\r",
+											"\r",
+											"// Guardar 'merchantId' en el environment actual\r",
+											"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+											"\r",
+											"\r",
+											"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"let response = pm.response.json();\r",
+											"pm.environment.set(\"access_token\", response.access_token);\r",
+											"console.log(\"Access token guardado:\", response.access_token);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Almacenar la respuesta directamente\r",
+											"const userId = pm.response.text(); // Obtener la respuesta como texto\r",
+											"\r",
+											"// Verificar que la respuesta no esté vacía y es un string alfanumérico\r",
+											"pm.test(\"User ID is not empty and is alphanumeric\", function () {\r",
+											"    pm.expect(userId).to.not.be.empty; // Asegúrate de que no esté vacío\r",
+											"    pm.expect(userId).to.match(/^[a-zA-Z0-9-]+$/); // Verificar que el formato es alfanumérico\r",
+											"});\r",
+											"\r",
+											"// Guardar el ID en una variable de entorno\r",
+											"pm.environment.set(\"user_id\", userId); // Guarda el ID en la variable de entorno 'user_id'\r",
+											"\r",
+											"// Opcional: Mostrar en la consola para verificar\r",
+											"console.log(\"User ID saved:\", userId);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"Carlo\",\r\n    \"lastName\": \"Esquivel\",\r\n    \"email\": \"carlosesquivelrios@gmail.com\",\r\n    \"phone\": \"+595984388144\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"role\": \"admin\",\r\n    \"birthDate\": \"1994-11-04\",\r\n    \"isMaster\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/internal/users",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user by userid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta esté en formato JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+											"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update user by userid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"Carlossss\",\r\n    \"lastName\": \"Esquivel\",\r\n    \"email\": \"carlosesquivelrios@gmail.com\",\r\n    \"phone\": \"+595984388144\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"role\": \"admin\",\r\n    \"birthDate\": \"1994-11-04\",\r\n    \"isMaster\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"Hola.123456\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}/set-new-password",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}",
+										"set-new-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user by userid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validar que el DELETE fue exitoso\r",
+											"pm.test(\"Status code is 200 (DELETE exitoso, sin respuesta)\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(200); // Código esperado para DELETE sin contenido\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user by userid delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validar que el DELETE fue exitoso\r",
+											"pm.test(\"Status code is 404 (DELETE exitoso, sin respuesta)\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(404); // Código esperado para DELETE sin contenido\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validar mensaje de error\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    var userId = pm.variables.get(\"user_id\"); // Obtiene la variable user_id del entorno\r",
+											"    var expectedMessage = `NotFoundException: User not found with id=[${userId}]`;\r",
+											"    pm.expect(jsonData.message).to.eql(expectedMessage);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta esté en formato JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+											"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+											"});\r",
+											"\r",
+											"\r",
+											"// Parsear la respuesta como JSON\r",
+											"let responseBody = pm.response.json();\r",
+											"\r",
+											"// Verificar que el campo 'merchantId' está presente\r",
+											"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+											"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+											"});\r",
+											"\r",
+											"// Guardar 'merchantId' en el environment actual\r",
+											"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+											"\r",
+											"// Mensaje en la consola para confirmar\r",
+											"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+											"\r",
+											"\r",
+											"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+											"\r",
+											"let response = pm.response.json();\r",
+											"pm.environment.set(\"access_token\", response.access_token);\r",
+											"console.log(\"Access token guardado:\", response.access_token);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/users/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"users",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Almacenar la respuesta directamente\r",
+											"const userId = pm.response.text(); // Obtener la respuesta como texto\r",
+											"\r",
+											"// Verificar que la respuesta no esté vacía y es un string alfanumérico\r",
+											"pm.test(\"User ID is not empty and is alphanumeric\", function () {\r",
+											"    pm.expect(userId).to.not.be.empty; // Asegúrate de que no esté vacío\r",
+											"    pm.expect(userId).to.match(/^[a-zA-Z0-9-]+$/); // Verificar que el formato es alfanumérico\r",
+											"});\r",
+											"\r",
+											"// Guardar el ID en una variable de entorno\r",
+											"pm.environment.set(\"user_id\", userId); // Guarda el ID en la variable de entorno 'user_id'\r",
+											"\r",
+											"// Opcional: Mostrar en la consola para verificar\r",
+											"console.log(\"User ID saved:\", userId);\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"Carlo\",\r\n    \"lastName\": \"Esquivel\",\r\n    \"email\": \"carlosesquivelrios@gmail.com\",\r\n    \"phone\": \"+595984388144\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"role\": \"user\",\r\n    \"birthDate\": \"1994-11-04\",\r\n    \"isMaster\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/internal/users",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user by userid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta esté en formato JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+											"pm.test(\"El rol en la respuesta es 'user'\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.role).to.eql(\"user\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update user by userid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que la respuesta no contiene contraseñas\r",
+											"\r",
+											"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+											"    const responseText = pm.response.text();\r",
+											"    pm.expect(responseText).to.not.include(\"password\");\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"Carlossss\",\r\n    \"lastName\": \"Esquivel\",\r\n    \"email\": \"carlosesquivelrios@gmail.com\",\r\n    \"phone\": \"+595984388144\",\r\n    \"merchantId\": \"{{merchantId}}\",\r\n    \"role\": \"admin\",\r\n    \"birthDate\": \"1994-11-04\",\r\n    \"isMaster\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 200\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"Hola.123456\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}/set-new-password",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}",
+										"set-new-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user by userid",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validar que el DELETE fue exitoso\r",
+											"pm.test(\"Status code is 200 (DELETE exitoso, sin respuesta)\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(200); // Código esperado para DELETE sin contenido\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user by userid delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validar que el DELETE fue exitoso\r",
+											"pm.test(\"Status code is 404 (DELETE exitoso, sin respuesta)\", function () {\r",
+											"    pm.expect(pm.response.code).to.eql(404); // Código esperado para DELETE sin contenido\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validar mensaje de error\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    var userId = pm.variables.get(\"user_id\"); // Obtiene la variable user_id del entorno\r",
+											"    var expectedMessage = `NotFoundException: User not found with id=[${userId}]`;\r",
+											"    pm.expect(jsonData.message).to.eql(expectedMessage);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "itti-api-key",
+										"value": "01234560",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{url}}/internal/users/{{user_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"internal",
+										"users",
+										"{{user_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "### **Gestión de Usuarios (Incluyendo Admin y User)**\n\n#### **Gestión de Usuarios**\n\n**Descripción:**\n\nEste conjunto de endpoints permite la administración de usuarios, incluyendo la creación, consulta, actualización y eliminación de usuarios con diferentes roles (`admin` y `user`). Se asegura que los roles cuenten con los permisos adecuados para gestionar recursos en el sistema.\n\n---\n\n### **Endpoints y Métodos**\n\n---\n\n#### **1\\. Crear Usuario (Admin/User)**\n\n- 📌 **Endpoint:** `/users`\n    \n- 📤 **Método:** `POST`\n    \n- 🌐 **URL Base:** `{{url}}/users`\n    \n\n**Pruebas:**\n\n1. **Creación de un usuario con rol** **`user`****:**\n    \n    - Validar que la respuesta sea un código **201** y que el usuario tenga el rol `user`.\n        \n2. **Creación de un usuario con rol** **`admin`****:**\n    \n    - Confirmar que la API responde con código **201** y que el rol es `admin`.\n        \n\n---\n\n#### **2\\. Consultar Usuario(s)**\n\n- 📌 **Endpoint:** `/users` o `/users/{{userId}}`\n    \n- 📤 **Método:** `GET`\n    \n- 🌐 **URL Base:** `{{url}}/users`\n    \n\n**Pruebas:**\n\n1. **Consultar todos los usuarios:**\n    \n    - Realizar una solicitud general para listar usuarios.\n        \n    - Verificar que la respuesta incluye un listado de usuarios con datos como nombre, correo y rol.\n        \n2. **Filtrar por rol (****`admin`** **o** **`user`****):**\n    \n    - Probar si la API permite filtros para listar usuarios específicos según su rol.\n        \n    - Confirmar que los datos retornados coincidan con el filtro aplicado.\n        \n3. **Consultar un usuario específico:**\n    \n    - Enviar un `userId` válido y validar que la respuesta sea un código **200** con la información del usuario.\n        \n4. **Usuario no encontrado:**\n    \n    - Intentar consultar un `userId` inexistente y verificar respuesta con código **404**.\n        \n\n---\n\n#### **3\\. Actualizar Usuario**\n\n- 📌 **Endpoint:** `/users/{{userId}}`\n    \n- 📤 **Método:** `PUT`\n    \n- 🌐 **URL Base:** `{{url}}/users/{{userId}}`\n    \n\n**Pruebas:**\n\n1. **Actualizar datos de un usuario** **`user`****:**\n    \n    - Modificar campos como nombre o correo para un usuario con rol `user`.\n        \n    - Confirmar que la respuesta sea un código **200** con los datos actualizados.\n        \n2. **Actualizar rol de un usuario a** **`admin`****:**\n    \n    - Probar cambiando el rol de un usuario de `user` a `admin`.\n        \n    - Validar que el cambio sea aceptado y reflejado correctamente.\n        \n3. **Campos no válidos:**\n    \n    - Intentar actualizar con un correo malformado o un rol inválido.\n        \n    - Verificar que la API devuelve un código **400**.\n        \n4. **Usuario no encontrado:**\n    \n    - Enviar un `userId` inexistente y confirmar que la respuesta sea un código **404**.\n        \n\n---\n\n#### **4\\. Eliminar Usuario**\n\n- 📌 **Endpoint:** `/users/{{userId}}`\n    \n- 📤 **Método:** `DELETE`\n    \n- 🌐 **URL Base:** `{{url}}/users/{{userId}}`\n    \n\n**Pruebas:**\n\n1. **Eliminar un usuario** **`user`****:**\n    \n    - Enviar una solicitud con un `userId` válido de un usuario con rol `user`.\n        \n    - Confirmar que la respuesta sea un código **200** o **204** y que el usuario ya no exista en el sistema.\n        \n2. **Eliminar un usuario** **`admin`****:**\n    \n    - Intentar eliminar un usuario con rol `admin`.\n        \n    - Validar si existen restricciones o si el administrador puede ser eliminado correctamente.\n        \n3. **Usuario no encontrado:**\n    \n    - Intentar eliminar un usuario con un `userId` inexistente.\n        \n    - Verificar que la API responde con un código **404**."
+		},
+		{
+			"name": "Notifications (Notificaciones)",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta esté en formato JSON\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+									"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Verificar que el campo 'merchantId' está presente\r",
+									"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+									"});\r",
+									"\r",
+									"// Guardar 'merchantId' en el environment actual\r",
+									"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+									"\r",
+									"// Mensaje en la consola para confirmar\r",
+									"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+									"\r",
+									"\r",
+									"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"pm.environment.set(\"access_token\", response.access_token);\r",
+									"console.log(\"Access token guardado:\", response.access_token);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Notifications type  INFO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Validar que la respuesta contiene el campo userId\r",
+									"pm.test(\"Validar que id está presente\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"id\");\r",
+									"});\r",
+									"\r",
+									"// Guardar el valor de userId como una variable de entorno\r",
+									"pm.environment.set(\"id_notificacion\", responseBody.id);\r",
+									"\r",
+									"// Mensaje para confirmar que la variable se guardó correctamente\r",
+									"console.log(\"Variable de entorno Id guardada:\", responseBody.id);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"merchantId\": \"{{merchantId}}\",\r\n  \"type\": \"INFO\",\r\n  \"title\": \"Title\",\r\n  \"message\": \"Factura de Enero\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/notifications",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Notifications type  PROMO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Validar que la respuesta contiene el campo userId\r",
+									"pm.test(\"Validar que id está presente\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"id\");\r",
+									"});\r",
+									"\r",
+									"// Guardar el valor de userId como una variable de entorno\r",
+									"pm.environment.set(\"id_notificacion\", responseBody.id);\r",
+									"\r",
+									"// Mensaje para confirmar que la variable se guardó correctamente\r",
+									"console.log(\"Variable de entorno Id guardada:\", responseBody.id);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"merchantId\": \"{{merchantId}}\",\r\n  \"type\": \"PROMO\",\r\n  \"title\": \"Title\",\r\n  \"message\": \"Enero con reintegro\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/notifications",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Notifications type  ALERT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Validar que la respuesta contiene el campo userId\r",
+									"pm.test(\"Validar que id está presente\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"id\");\r",
+									"});\r",
+									"\r",
+									"// Guardar el valor de userId como una variable de entorno\r",
+									"pm.environment.set(\"id_notificacion\", responseBody.id);\r",
+									"\r",
+									"// Mensaje para confirmar que la variable se guardó correctamente\r",
+									"console.log(\"Variable de entorno Id guardada:\", responseBody.id);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"merchantId\": \"{{merchantId}}\",\r\n  \"type\": \"ALERT\",\r\n  \"title\": \"Title\",\r\n  \"message\": \"Factura\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/notifications",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Notifications search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Convertimos la respuesta a JSON\r",
+									"let response = pm.response.json();\r",
+									"\r",
+									"// Verificamos que response.notifications exista y sea un array\r",
+									"if (!response.notifications || !Array.isArray(response.notifications)) {\r",
+									"    console.error(\"La respuesta no contiene un array de notificaciones.\");\r",
+									"    pm.test(\"La respuesta debe contener notificaciones\", () => {\r",
+									"        pm.expect(response.notifications).to.be.an(\"array\");\r",
+									"    });\r",
+									"} else {\r",
+									"    // ID que quieres buscar\r",
+									"    let id_notificacion = pm.variables.get(\"id_notificacion\"); // Obtiene la variable de entorno de Postman\r",
+									"\r",
+									"    // Lista de notificaciones\r",
+									"    let notifications = response.notifications;\r",
+									"\r",
+									"    // Verificar si el ID está presente\r",
+									"    let encontrado = notifications.some(notification => notification.id === id_notificacion);\r",
+									"\r",
+									"    // Mostrar resultado en la consola\r",
+									"    if (encontrado) {\r",
+									"        console.log(`✅ El ID ${id_notificacion} está presente en las notificaciones.`);\r",
+									"    } else {\r",
+									"        console.error(`❌ El ID ${id_notificacion} NO está presente en las notificaciones.`);\r",
+									"    }\r",
+									"\r",
+									"    // Asegurar que la prueba pase o falle según el resultado\r",
+									"    pm.test(`El ID ${id_notificacion} está presente`, () => {\r",
+									"        pm.expect(encontrado).to.be.true;\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{access_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"notifications\": [\r\n    {\r\n      \"id\": \"{{id_notificacion}}\",\r\n      \"merchantId\": \"{{merchantId}}\",\r\n      \"type\": \"INFO\",\r\n      \"title\": \"Title\",\r\n      \"message\": \"string\",\r\n      \"sentAt\": \"2024-11-20T19:11:25.415Z\",\r\n      \"readAt\": \"2025-11-20T19:11:25.415Z\"\r\n    }\r\n  ],\r\n  \"totalUnread\": 0,\r\n  \"page\": 0,\r\n  \"limit\": 0,\r\n  \"totalItems\": 0,\r\n  \"totalPages\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/notifications",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"notifications"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "notifications mark-as-read",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Validar que la respuesta contiene el campo userId\r",
+									"pm.test(\"Validar que id está presente\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"id\");\r",
+									"});\r",
+									"\r",
+									"// Guardar el valor de userId como una variable de entorno\r",
+									"pm.environment.set(\"id_notificacion\", responseBody.id);\r",
+									"\r",
+									"// Mensaje para confirmar que la variable se guardó correctamente\r",
+									"console.log(\"Variable de entorno Id guardada:\", responseBody.id);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICItT21PU2dfUFVzbFUwN0FianNjckdwR2F6emJEMEJTVDdZbG13SmtObjlBIn0.eyJleHAiOjE3NDEyMDQzMDAsImlhdCI6MTc0MTIwMzEwMCwianRpIjoiNzU4YzI1OTgtNzFiOC00ZjdmLWJhNzEtODY5MTgzOGRkNTg1IiwiaXNzIjoiaHR0cHM6Ly8xMC43LjQuMTE6ODQ0My9yZWFsbXMvcWEtdXBheS1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIzZTExY2MyYi00ODI5LTQwMTItYjYyNC04NTg0ZWUwNzhjZjciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJxYS11cGF5LWNsaWVudCIsInNpZCI6Ijc4M2NlY2I5LWFkOWQtNDE1MC1iYTFiLTNkZjBiZDYxZjIwOSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtcWEtdXBheS1yZWFsbSIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJNaWd1ZWwgRXNxdWl2ZWwiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJtaWd1ZWxlc3F1aXZlbDE3MEBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoiTWlndWVsIiwiZmFtaWx5X25hbWUiOiJFc3F1aXZlbCIsImVtYWlsIjoibWlndWVsZXNxdWl2ZWwxNzBAZ21haWwuY29tIn0.R_hPvmgVLdt-jkRcGRVoqT7Enc1V6nkweJt-ZpQpnUsdO6HEdFrmj9xi2DSUiNeFsx_dmpowLCpVYMW68YjuvkSvZa2Ui6iINfkUy6rqWLTvRiEyoM_niyZOx0KnmYC8eMECPE-c0zmOs0BsSGeSBZxKtVk9X06aaKQhDZm6eulmPcd0pxFadBm9C122qtJlJLkD3hI7HliVxhrPBI0JYDJhD28oP4SjT5PHsk1HqQloaN_bGjBgn3v5QVAKUoimiPim20bvUlsK0KFvH0SovTVBlkdXzqBnnebzTsoab7I3Z06v9lLZFA8EtY0Fv6_QKo-rnu9GhsQgxaZLj8X3dw"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/notifications/{{id_notificacion}}/mark-as-read",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"notifications",
+								"{{id_notificacion}}",
+								"mark-as-read"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transaction (Transacciones)",
+			"item": [
+				{
+					"name": "csv",
+					"item": [
+						{
+							"name": "Trx get Csv",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/merchants/{{merchantId}}/transactions/csv?startDate=2024-01-01&endDate=2025-12-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"merchants",
+										"{{merchantId}}",
+										"transactions",
+										"csv"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2024-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-12-01"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Untitled Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/merchants/:merchant_id/transactions/csv?startDate=<dateTime>&endDate=<dateTime>&page=<number>&size=<number>&status=<string>&card_brand=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"merchants",
+												":merchant_id",
+												"transactions",
+												"csv"
+											],
+											"query": [
+												{
+													"key": "startDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "endDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "page",
+													"value": "<number>"
+												},
+												{
+													"key": "size",
+													"value": "<number>"
+												},
+												{
+													"key": "status",
+													"value": "<string>"
+												},
+												{
+													"key": "card_brand",
+													"value": "<string>"
+												}
+											],
+											"variable": [
+												{
+													"key": "merchant_id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Trx getLiquidations Csv",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/merchants/{{merchantId}}/transactions/liquidations/csv?startDate=2025-01-01&endDate=2025-12-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"merchants",
+										"{{merchantId}}",
+										"transactions",
+										"liquidations",
+										"csv"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2025-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-12-01"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Untitled Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/merchants/:merchant_id/transactions/csv?startDate=<dateTime>&endDate=<dateTime>&page=<number>&size=<number>&status=<string>&card_brand=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"merchants",
+												":merchant_id",
+												"transactions",
+												"csv"
+											],
+											"query": [
+												{
+													"key": "startDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "endDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "page",
+													"value": "<number>"
+												},
+												{
+													"key": "size",
+													"value": "<number>"
+												},
+												{
+													"key": "status",
+													"value": "<string>"
+												},
+												{
+													"key": "card_brand",
+													"value": "<string>"
+												}
+											],
+											"variable": [
+												{
+													"key": "merchant_id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						},
+						{
+							"name": "Trx getSales Csv",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/merchants/{{merchantId}}/transactions/sales/csv?startDate=2025-01-01&endDate=2025-12-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"merchants",
+										"{{merchantId}}",
+										"transactions",
+										"sales",
+										"csv"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2025-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-12-01"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Untitled Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/merchants/:merchant_id/transactions/csv?startDate=<dateTime>&endDate=<dateTime>&page=<number>&size=<number>&status=<string>&card_brand=<string>",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"merchants",
+												":merchant_id",
+												"transactions",
+												"csv"
+											],
+											"query": [
+												{
+													"key": "startDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "endDate",
+													"value": "<dateTime>"
+												},
+												{
+													"key": "page",
+													"value": "<number>"
+												},
+												{
+													"key": "size",
+													"value": "<number>"
+												},
+												{
+													"key": "status",
+													"value": "<string>"
+												},
+												{
+													"key": "card_brand",
+													"value": "<string>"
+												}
+											],
+											"variable": [
+												{
+													"key": "merchant_id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "text",
+									"header": [],
+									"cookie": [],
+									"body": ""
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "xlsx",
+					"item": [
+						{
+							"name": "Trx get Xlsx",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/merchants/{{merchantId}}/transactions/xlsx?startDate=2024-01-01&endDate=2025-12-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"merchants",
+										"{{merchantId}}",
+										"transactions",
+										"xlsx"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2024-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-12-01"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Trx getSales Xlsx",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/merchants/{{merchantId}}/transactions/sales/xlsx?startDate=2025-01-01&endDate=2025-12-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"merchants",
+										"{{merchantId}}",
+										"transactions",
+										"sales",
+										"xlsx"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2025-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-12-01"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Trx getLiquidations Xlsx",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verificar que el código de estado sea 201 \r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+											"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{onb_backend_access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/merchants/{{merchantId}}/transactions/liquidations/xlsx?startDate=2025-01-01&endDate=2025-12-01",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"merchants",
+										"{{merchantId}}",
+										"transactions",
+										"liquidations",
+										"xlsx"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2025-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2025-12-01"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta esté en formato JSON\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+									"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Verificar que el campo 'merchantId' está presente\r",
+									"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+									"});\r",
+									"\r",
+									"// Guardar 'merchantId' en el environment actual\r",
+									"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+									"\r",
+									"// Mensaje en la consola para confirmar\r",
+									"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+									"\r",
+									"\r",
+									"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"pm.environment.set(\"access_token\", response.access_token);\r",
+									"console.log(\"Access token guardado:\", response.access_token);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get /transactions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/merchants/{{merchantId}}/transactions?startDate=2025-01-01&endDate=2025-12-01&page=1&size=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"merchants",
+								"{{merchantId}}",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get /sales",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/merchants/{{merchantId}}/transactions/sales?startDate=2024-01-01&endDate=2023-12-01&page=1&size=20&status=DENIED",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"merchants",
+								"{{merchantId}}",
+								"transactions",
+								"sales"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2023-12-01"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "DENIED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get /liquidations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 201 \r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/merchants/{{merchantId}}/transactions/liquidations?startDate=2025-01-01&endDate=2025-12-01&page=1&size=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"merchants",
+								"{{merchantId}}",
+								"transactions",
+								"liquidations"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "**Descripción:**  \nEste endpoint permite obtener el listado de transacciones asociadas a un comercio específico, identificado por su `merchantId`.\n\n- 📌 **Endpoint:** `/merchants/{{merchantId}}/transactions`\n    \n- 📤 **Método:** `GET`\n    \n- 🌐 **URL Base:** `{{url}}/merchants/{{merchantId}}/transactions`\n    \n\n**Pruebas:**\n\n1. **Obtener todas las transacciones de un comercio válido:**\n    \n    - Validar que el endpoint responde con un código **200**.\n        \n    - Confirmar que la respuesta contiene un listado de transacciones con los datos esperados (ID de transacción, monto, estado, fecha, etc.)."
+		},
+		{
+			"name": "Metrics (Metricas)",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta esté en formato JSON\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+									"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Verificar que el campo 'merchantId' está presente\r",
+									"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+									"});\r",
+									"\r",
+									"// Guardar 'merchantId' en el environment actual\r",
+									"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+									"\r",
+									"// Mensaje en la consola para confirmar\r",
+									"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+									"\r",
+									"\r",
+									"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"pm.environment.set(\"access_token\", response.access_token);\r",
+									"console.log(\"Access token guardado:\", response.access_token);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Client Metrics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/metrics/{{merchantId}}?startDate=2025-11-18&endDate=2025-12-18\n",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"metrics",
+								"{{merchantId}}"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-11-18"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-18\n"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products (Mis productos)",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta no contiene contraseñas\r",
+									"pm.test(\"Verificar que la respuesta no contiene contraseñas\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"password\");\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta esté en formato JSON\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// validar que el cuerpo de la respuesta contiene \"role\": \"admin\"\r",
+									"pm.test(\"El rol en la respuesta es 'admin'\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.role).to.eql(\"admin\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"// Parsear la respuesta como JSON\r",
+									"let responseBody = pm.response.json();\r",
+									"\r",
+									"// Verificar que el campo 'merchantId' está presente\r",
+									"pm.test(\"El campo 'merchantId' está presente en la respuesta\", function () {\r",
+									"    pm.expect(responseBody).to.have.property(\"merchantId\");\r",
+									"});\r",
+									"\r",
+									"// Guardar 'merchantId' en el environment actual\r",
+									"pm.environment.set(\"merchantId\", responseBody.merchantId);\r",
+									"\r",
+									"// Mensaje en la consola para confirmar\r",
+									"console.log(\"merchantId guardado:\", responseBody.merchantId);\r",
+									"\r",
+									"\r",
+									"pm.globals.set(\"onb_backend_access_token\", pm.response.json().access_token);\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"pm.environment.set(\"access_token\", response.access_token);\r",
+									"console.log(\"Access token guardado:\", response.access_token);\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{rol-admin}}\",\r\n    \"password\": \"{{password-rol-admin}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener product-sellers por id de seller",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que el código de estado sea 200\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// Verificar que la respuesta esté en formato JSON\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// Verificar que el tiempo de respuesta sea menor a 2000 ms (2 segundos)\r",
+									"pm.test(\"Tiempo de respuesta menor a 500ms\", function () {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{onb_backend_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICItT21PU2dfUFVzbFUwN0FianNjckdwR2F6emJEMEJTVDdZbG13SmtObjlBIn0.eyJleHAiOjE3NDEyMDQzMDAsImlhdCI6MTc0MTIwMzEwMCwianRpIjoiNzU4YzI1OTgtNzFiOC00ZjdmLWJhNzEtODY5MTgzOGRkNTg1IiwiaXNzIjoiaHR0cHM6Ly8xMC43LjQuMTE6ODQ0My9yZWFsbXMvcWEtdXBheS1yZWFsbSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIzZTExY2MyYi00ODI5LTQwMTItYjYyNC04NTg0ZWUwNzhjZjciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJxYS11cGF5LWNsaWVudCIsInNpZCI6Ijc4M2NlY2I5LWFkOWQtNDE1MC1iYTFiLTNkZjBiZDYxZjIwOSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtcWEtdXBheS1yZWFsbSIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJNaWd1ZWwgRXNxdWl2ZWwiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJtaWd1ZWxlc3F1aXZlbDE3MEBnbWFpbC5jb20iLCJnaXZlbl9uYW1lIjoiTWlndWVsIiwiZmFtaWx5X25hbWUiOiJFc3F1aXZlbCIsImVtYWlsIjoibWlndWVsZXNxdWl2ZWwxNzBAZ21haWwuY29tIn0.R_hPvmgVLdt-jkRcGRVoqT7Enc1V6nkweJt-ZpQpnUsdO6HEdFrmj9xi2DSUiNeFsx_dmpowLCpVYMW68YjuvkSvZa2Ui6iINfkUy6rqWLTvRiEyoM_niyZOx0KnmYC8eMECPE-c0zmOs0BsSGeSBZxKtVk9X06aaKQhDZm6eulmPcd0pxFadBm9C122qtJlJLkD3hI7HliVxhrPBI0JYDJhD28oP4SjT5PHsk1HqQloaN_bGjBgn3v5QVAKUoimiPim20bvUlsK0KFvH0SovTVBlkdXzqBnnebzTsoab7I3Z06v9lLZFA8EtY0Fv6_QKo-rnu9GhsQgxaZLj8X3dw"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/product-seller/seller/{{merchantId}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"product-seller",
+								"seller",
+								"{{merchantId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
